@@ -1,17 +1,20 @@
-﻿using DistributedLoggingSystem.Server.Models;
+﻿using DistributedLoggingSystem.Server.Data;
+using DistributedLoggingSystem.Server.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace DistributedLoggingSystem.Server.Implementations
 {
     public class DatabaseLogStorageBackend
     {
+        private readonly AppDbContext _context;
 
-        public DatabaseLogStorageBackend(/*AppDbContext context*/)
+        public DatabaseLogStorageBackend(AppDbContext context)
         {
-           // _context = context;
+            _context = context;
         }
 
-        /*public async Task StoreLogAsync(LogEntry logEntry)
+        public async Task StoreLogAsync(LogEntry logEntry)
         {
             _context.LogEntries.Add(logEntry);
             await _context.SaveChangesAsync();
@@ -26,6 +29,6 @@ namespace DistributedLoggingSystem.Server.Implementations
                     (!parameters.StartTime.HasValue || l.Timestamp >= parameters.StartTime) &&
                     (!parameters.EndTime.HasValue || l.Timestamp <= parameters.EndTime))
                 .ToListAsync();
-        }*/
+        }
     }
 }
