@@ -1,6 +1,11 @@
+using DistributedLoggingSystem.Server.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using DistributedLoggingSystem.Server.Implementations;
+using DistributedLoggingSystem.Server.Interfaces;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +24,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"))
         };
     });
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddScoped<ILogStorageBackend>(sp =>
+{
+    var storageBackend = builder.Configuration.GetValue<string>("StorageBackend");
+
+    return storageBackend switch
+    {
+        "Database" => (ILogStorageBackend)sp.GetRequiredService<DatabaseLogStorageBackend>(),
+        "File" => new FileLogStorageBackend(builder.Configuration),
+        _ => throw new InvalidOperationException("Invalid storage backend")
+    };
+});
 
 var app = builder.Build();
 
