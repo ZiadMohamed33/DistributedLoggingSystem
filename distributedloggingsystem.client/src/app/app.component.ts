@@ -1,12 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-
-interface WeatherForecast {
-  date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
-}
+import { LogEntry } from './models/log-entry';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -15,9 +9,14 @@ interface WeatherForecast {
 })
 export class AppComponent implements OnInit {
   title = 'distributedloggingsystem.client';
-  logs: string[] = [];
+  logs: LogEntry[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private authService: AuthService) {}
+  ngOnInit() {
+    this.getToken();
+  }
 
-  ngOnInit() {}
+  getToken(): void {
+    this.authService.getToken().subscribe();
+  }
 }
